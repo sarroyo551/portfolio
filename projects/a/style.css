@@ -1,0 +1,13 @@
+h1 {
+    color: red;
+}
+#box {
+    height: 100px;
+    width: 100px;
+    background-color: rgb(172, 172, 221);
+    align-items: center;
+}
+#boxContainer {
+    margin:auto;
+    background-color:black;
+}
