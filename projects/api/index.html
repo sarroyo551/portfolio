@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="halloween">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@2.14.1/dist/full.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Giphy</title>
+  </head>
+  <body>
+    <div
+      class="p-3 navbar flex flex-col items-start w-full border-gray-400 mx-3 rounded"
+    >
+      <div class="py-5 w-72 flex justify-between">
+        <button id="trending" class="capitalize rounded btn btn-sm btn-primary">
+          trending
+        </button>
+        <button id="random" class="capitalize rounded btn btn-sm btn-secondary">
+          Random
+        </button>
+        <button id="stickers" class="capitalize rounded btn btn-sm btn-accent">
+          Stickers
+        </button>
+      </div>
+      <div class="form-control">
+        <label for="search" class="label w-full">Search</label>
+        <div class="input w-72 flex input-bordered overflow-hidden p-0">
+          <input
+            type="text"
+            id="search"
+            placeholder="search Gifs"
+            class="bg-neutral h-full w-full input"
+          />
+          <button id="go" class="btn btn-success btn-sqaure">Go</button>
+        </div>
+      </div>
+    </div>
+    <div class="border border-[0.1rem] border-gray-500"></div>
+    <div id="main" class="flex justify-center items-center pb-20">
+      <div id="trending-container" class="flex flex-wrap"></div>
+      <div id="random-container" class="flex flex-wrap"></div>
+      <div id="stickers-container" class="flex flex-wrap"></div>
+      <div id="query-container" class="flex flex-wrap"></div>
+    </div>
+
+    <script>
+      let query = '';
+      const go = document.getElementById('go');
+      const input = document.getElementById('search');
+      const RandBtn = document.querySelector('#random');
+      const trendBtn = document.querySelector('#trending');
+      const StickBtn = document.querySelector('#stickers');
+
+      function trending() {
+        fetch(
+          'https://api.giphy.com/v1/gifs/trending?api_key=nuCKsGzCw7MSqDnXj41gO2IGWKmOsMBu&limit=25&rating=g',
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            for (const obj of data.data) {
+              console.log(obj);
+              let embed = document.createElement('embed');
+              embed.src = obj.embed_url;
+              embed.className = 'w-96 h-96 bg-black m-3';
+              document.querySelector('#trending-container').appendChild(embed);
+            }
+            console.log(data);
+          });
+      }
+
+      function random() {
+        fetch(
+          'https://api.giphy.com/v1/gifs/random?api_key=nuCKsGzCw7MSqDnXj41gO2IGWKmOsMBu&tag=&rating=g',
+        )
+          .then((res) => res.json())
+          .then(({ data }) => {
+            console.log(data.embed_url);
+            let embed = document.createElement('embed');
+            embed.src = data.embed_url;
+            embed.className =
+              'w-96 h-96 bg-black m-3 flex justify-center items-center';
+            document.querySelector('#random-container').appendChild(embed);
+
+            console.log(data);
+          });
+      }
+
+      function stickers() {
+        fetch(
+          'https://api.giphy.com/v1/stickers/packs?api_key=nuCKsGzCw7MSqDnXj41gO2IGWKmOsMBu',
+        )
+          .then((res) => res.json())
+          .then(({ data }) => {
+            console.log(data);
+            for (const obj of data) {
+              let embed = document.createElement('embed');
+              embed.src = obj.featured_gif.embed_url;
+              embed.className =
+                'w-96 h-96 bg-black m-3 flex justify-center items-center';
+              document.querySelector('#random-container').appendChild(embed);
+            }
+          });
+      }
+
+      input.addEventListener('change', function (e) {
+        query += e.target.value;
+      });
+
+      go.addEventListener('click', function (e) {
+        document.querySelector('#search').value = '';
+        console.log(
+          `https://api.giphy.com/v1/gifs/search?api_key=nuCKsGzCw7MSqDnXj41gO2IGWKmOsMBu&q=${query}&limit=25&offset=0&rating=g&lang=en`,
+        );
+        fetch(
+          `https://api.giphy.com/v1/gifs/search?api_key=nuCKsGzCw7MSqDnXj41gO2IGWKmOsMBu&q=${query}&limit=25&offset=0&rating=g&lang=en`,
+        )
+          .then((res) => res.json())
+          .then(({ data }) => {
+            console.log(data.length);
+            if (data.length > 1) {
+              for (const obj of data) {
+                console.log(obj);
+                let embed = document.createElement('embed');
+                embed.src = obj.embed_url;
+                embed.className =
+                  'w-96 h-96 bg-black m-3 flex justify-center items-center';
+                document.querySelector('#query-container').appendChild(embed);
+              }
+            }
+          });
+      });
+
+      RandBtn.addEventListener('click', random);
+      trendBtn.addEventListener('click', trending);
+      StickBtn.addEventListener('click', stickers);
+    </script>
+  </body>
+</html>
